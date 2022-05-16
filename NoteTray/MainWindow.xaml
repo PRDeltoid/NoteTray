@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NoteTray"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="250">
-    <Grid>
+        Title="Note Tray" Height="550" Width="250"
+        Background="Gray">
+    <Grid Margin="3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+    
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="25" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBox Background="LightGray" Height="23" Grid.Column="0" x:Name="txtSearchbox" Text="Search" BorderBrush="DarkSlateGray" BorderThickness="2" /> 
+            <Button Background="SlateGray" Foreground="DarkSlateGray" Width="23" Height="23" Grid.Column="1">...</Button>
+        </Grid>
+        
+        <ListBox Grid.Row="1" Margin="1 0" Background="LightGray" x:Name="lstNoteFiles" />
     </Grid>
 </Window>
