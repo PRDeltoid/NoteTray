@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using NoteTrayLib;
 
 namespace NoteTray
 {
@@ -20,9 +9,38 @@ namespace NoteTray
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly DirectoryService _directoryService;
+
+        public MainWindow(DirectoryService directoryService)
         {
+            _directoryService = directoryService;
             InitializeComponent();
+            // Remove placeholder "Search" text when the user selects the searchbox
+            txtSearchbox.GotFocus += RemoveText;
+            txtSearchbox.LostFocus += AddText;
+
+            foreach (string dirName in _directoryService.GetChildDirectories("C:\\Users\\Taylor"))
+            {
+                lstNoteFiles.Items.Add(dirName + "\\");
+            }
+            foreach (string fileName in _directoryService.GetChildFiles("C:\\Users\\Taylor"))
+            {
+                lstNoteFiles.Items.Add(fileName);
+            }
+        }
+
+        private void RemoveText(object sender, EventArgs e)
+        {
+            if (txtSearchbox.Text == "Search...")
+            {
+                txtSearchbox.Text = "";
+            }
+        }
+
+        private void AddText(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearchbox.Text))
+                txtSearchbox.Text = "Search...";
         }
     }
 }
