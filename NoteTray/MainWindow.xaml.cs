@@ -19,11 +19,13 @@ namespace NoteTray
             txtSearchbox.GotFocus += RemoveText;
             txtSearchbox.LostFocus += AddText;
 
-            foreach (string dirName in _directoryService.GetChildDirectories("C:\\Users\\Taylor"))
+            const string notesBasePath = "C:\\Users\\Taylor";
+            // Load a list of directories and files
+            foreach (string dirName in DirectoryService.GetChildDirectories(notesBasePath))
             {
                 lstNoteFiles.Items.Add(dirName + "\\");
             }
-            foreach (string fileName in _directoryService.GetChildFiles("C:\\Users\\Taylor"))
+            foreach (string fileName in DirectoryService.GetChildFiles(notesBasePath))
             {
                 lstNoteFiles.Items.Add(fileName);
             }
