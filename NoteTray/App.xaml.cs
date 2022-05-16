@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using Autofac;
-using NoteTrayLib;
+using Serilog;
+using Serilog.Core;
 
 namespace NoteTray
 {
@@ -13,14 +14,12 @@ namespace NoteTray
 
         public App()
         {
-            ContainerBuilder builder = new ContainerBuilder();
-            
-            // Configure the DI container
-            builder.RegisterType<MainWindow>();
-            builder.RegisterType<DirectoryService>();
-            
-            // Finish building the container
-            _container = builder.Build();
+            _container = ContainerConfig.CreateContainer();
+            using Logger log = new LoggerConfiguration()
+                .WriteTo.Debug()
+                // .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+            Log.Logger = log;
         }
 
         private void OnStartup(object sender, StartupEventArgs e)
