@@ -3,20 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NoteTray"
         mc:Ignorable="d"
-        Title="Note Tray" Height="550" Width="250"
-        Background="Gray">
+        Title="Note Tray"
+        Height="650"
+        MaxHeight="850"
+        Width="300"
+        MaxWidth="400"
+        Background="{StaticResource BaseBrush1}">
     <Grid Margin="3">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-    
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -25,11 +28,17 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="25" />
             </Grid.ColumnDefinitions>
-            
-            <TextBox Background="LightGray" Height="23" Grid.Column="0" x:Name="txtSearchbox" Text="Search" BorderBrush="DarkSlateGray" BorderThickness="2" /> 
-            <Button Background="SlateGray" Foreground="DarkSlateGray" Width="23" Height="23" Grid.Column="1">...</Button>
+
+            <TextBox Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}" Height="23"
+                     Grid.Column="0" VerticalContentAlignment="Center" x:Name="txtSearchbox" Text="Search..."
+                     BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1" />
+            <Button Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}"
+                    BorderBrush="{StaticResource BaseBrush2}" Width="23" Height="23" Grid.Column="1">
+                ...
+            </Button>
         </Grid>
-        
-        <ListBox Grid.Row="1" Margin="1 0" Background="LightGray" x:Name="lstNoteFiles" />
+
+        <ListBox Grid.Row="1" Margin="1 0" Background="{StaticResource BaseBrush2}" Foreground="{StaticResource TextBrush1}" 
+                 x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1" />
     </Grid>
 </Window>
