@@ -17,7 +17,9 @@ namespace NoteTray
             _container = ContainerConfig.CreateContainer();
             using Logger log = new LoggerConfiguration()
                 .WriteTo.Debug()
-                // .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                #if DEBUG
+                .MinimumLevel.Debug()
+                #endif
                 .CreateLogger();
             Log.Logger = log;
         }
