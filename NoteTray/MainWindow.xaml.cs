@@ -11,7 +11,7 @@ namespace NoteTray
     {
         private readonly DirectoryService _directoryService;
 
-        public MainWindow(DirectoryService directoryService)
+        public MainWindow(DirectoryService directoryService, UserPreferenceService userPrefs)
         {
             _directoryService = directoryService;
             InitializeComponent();
