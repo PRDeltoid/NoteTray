@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using NoteTrayLib.Models;
+﻿using NoteTrayLib.Models;
 
-namespace NoteTrayLib;
+namespace NoteTrayLib.Utilities;
 
-public class DirectoryService
+public static class DirectoryUtilities
 {
     public static IEnumerable<NoteListItem> GetChildDirectories(string basePath)
     {
@@ -25,5 +22,18 @@ public class DirectoryService
             FileInfo fileInfo = new FileInfo(x);
             return fileInfo.Attributes.HasFlag(FileAttributes.Hidden) == false;
         }).Select(x => new NoteListItem() {FullPath = x, Name = Path.GetFileName(x), IsDirectory = false});
+    }
+
+    public static NoteListItem GetParentDirectory(string basePath)
+    {
+        DirectoryInfo? parent = Directory.GetParent(basePath);
+        if (parent != null)
+        {
+            return new NoteListItem() { FullPath = parent.FullName, Name = parent.Name, IsDirectory = true };
+        }
+        else
+        {
+            return null;
+        }
     }
 }

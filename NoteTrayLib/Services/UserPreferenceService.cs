@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NoteTrayLib.Services;
-using Serilog;
+﻿using Serilog;
 
-namespace NoteTrayLib;
+namespace NoteTrayLib.Services;
 
 public class UserPreferenceService
 {
