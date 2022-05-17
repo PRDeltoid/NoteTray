@@ -49,7 +49,7 @@
                 <DataTemplate.Triggers>
                     <!-- Show an icon next to directories -->
                     <DataTrigger Binding="{Binding IsDirectory}" Value="True">
-                        <Setter TargetName="tbDirectoryIcon" Property="Text" Value="D " />
+                        <Setter TargetName="tbDirectoryIcon" Property="Text" Value="📁 " />
                     </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
