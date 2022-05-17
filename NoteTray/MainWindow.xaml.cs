@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using NoteTrayLib;
+using NoteTrayLib.Models;
+using Serilog;
 
 namespace NoteTray
 {
@@ -15,9 +19,6 @@ namespace NoteTray
         {
             _directoryService = directoryService;
             InitializeComponent();
-            // Remove placeholder "Search" text when the user selects the searchbox
-            txtSearchbox.GotFocus += RemoveText;
-            txtSearchbox.LostFocus += AddText;
 
             // Get the user's base note directory
             // If no preference exists, use the User Profile directory
@@ -29,14 +30,26 @@ namespace NoteTray
             }
 
             // Load a list of directories and files
-            foreach (string dirName in DirectoryService.GetChildDirectories(notesBasePath))
+            foreach (NoteListItem dirItem in DirectoryService.GetChildDirectories(notesBasePath))
             {
-                lstNoteFiles.Items.Add(dirName + "\\");
+                lstNoteFiles.Items.Add(dirItem);
             }
-            foreach (string fileName in DirectoryService.GetChildFiles(notesBasePath))
+            foreach (NoteListItem fileitem in DirectoryService.GetChildFiles(notesBasePath))
             {
-                lstNoteFiles.Items.Add(fileName);
+                lstNoteFiles.Items.Add(fileitem);
             }
+
+            // Remove placeholder "Search" text when the user selects the searchbox
+            txtSearchbox.GotFocus += RemoveText;
+            txtSearchbox.LostFocus += AddText;
+            
+            // Move into directories on click
+            lstNoteFiles.SelectionChanged += ItemSelected;
+        }
+
+        private void ItemSelected(object sender, SelectionChangedEventArgs e)
+        {
+            Log.Debug("Item selected: {e}", e.AddedItems.Cast<NoteListItem>().First().FullPath);
         }
 
         private void RemoveText(object sender, EventArgs e)

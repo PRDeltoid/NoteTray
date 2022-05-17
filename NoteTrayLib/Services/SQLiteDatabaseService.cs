@@ -5,7 +5,7 @@ using System.Linq;
 using Dapper;
 using Serilog;
 
-namespace NoteTrayLib.services;
+namespace NoteTrayLib.Services;
 
 public class SQLiteDatabaseService : IDatabaseService
 {

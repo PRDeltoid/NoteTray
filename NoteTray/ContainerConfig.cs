@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using NoteTrayLib;
-using NoteTrayLib.services;
+using NoteTrayLib.Services;
 
 namespace NoteTray;
 
-public class ContainerConfig
+public static class ContainerConfig
 {
     public static IContainer CreateContainer()
     {

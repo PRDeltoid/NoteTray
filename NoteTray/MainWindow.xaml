@@ -39,6 +39,21 @@
         </Grid>
 
         <ListBox Grid.Row="1" Margin="1 0" Background="{StaticResource BaseBrush2}" Foreground="{StaticResource TextBrush1}" 
-                 x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1" />
+                 x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1">
+            <ListBox.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="tbDirectoryIcon" Text="" />
+                    <TextBlock Text="{Binding Name}"/>
+                </StackPanel>
+                <DataTemplate.Triggers>
+                    <!-- Show an icon next to directories -->
+                    <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                        <Setter TargetName="tbDirectoryIcon" Property="Text" Value="D " />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </Window>

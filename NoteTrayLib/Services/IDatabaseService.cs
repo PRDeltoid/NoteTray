@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NoteTrayLib.services;
+namespace NoteTrayLib.Services;
 
 public interface IDatabaseService
 {

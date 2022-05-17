@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NoteTrayLib.services;
+using NoteTrayLib.Services;
 using Serilog;
 
 namespace NoteTrayLib;
