@@ -19,7 +19,15 @@ namespace NoteTray
             txtSearchbox.GotFocus += RemoveText;
             txtSearchbox.LostFocus += AddText;
 
-            const string notesBasePath = "C:\\Users\\Taylor";
+            // Get the user's base note directory
+            // If no preference exists, use the User Profile directory
+            if (userPrefs.TryGetPreference("basePath", out string notesBasePath) == false)
+            {
+                string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                userPrefs.SetPreference("basePath", userProfilePath);
+                notesBasePath = userProfilePath;
+            }
+
             // Load a list of directories and files
             foreach (string dirName in DirectoryService.GetChildDirectories(notesBasePath))
             {
