@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,10 +15,15 @@ namespace NoteTray
     public partial class MainWindow : Window
     {
         private readonly DirectoryManagerService _directoryService;
+        private readonly EditorManagerService _editorService;
+        private readonly WindowSnapper _windowSnapper;
 
-        public MainWindow(DirectoryManagerService directoryService, UserPreferenceService userPrefs)
+        public MainWindow(DirectoryManagerService directoryService, EditorManagerService editorService)
         {
             _directoryService = directoryService;
+            _editorService = editorService;
+            // Window Snapper is used to attach this window to the side of another process and keep it there
+            _windowSnapper = new WindowSnapper(this);
             InitializeComponent();
 
             UpdateNotesList();
@@ -26,7 +32,7 @@ namespace NoteTray
             txtSearchbox.GotFocus += RemoveText;
             txtSearchbox.LostFocus += AddText;
             
-            // Move into directories on click
+            // Move into directories or open files on click
             lstNoteFiles.SelectionChanged += ItemSelected;
         }
 
@@ -55,15 +61,23 @@ namespace NoteTray
         {
             // Exit early if no items are selected. This tends to happen when the list is cleared and items are re-added
             if (e.AddedItems.Count == 0) return;
+            
             // Since our list is single-select only, we can safely use First() and not worry about losing results
             NoteListItem clickedItem = e.AddedItems.Cast<NoteListItem>().First();
             Log.Debug("Item selected: {fullPath}", clickedItem.FullPath);
             
-            // Exit early if the clicked item is not a directory
+            // If it's a directory, navigate to it
+            // If it's a file, open it
             if (clickedItem.IsDirectory)
             {
                 _directoryService.SetCurrentDirectory(clickedItem.FullPath);
                 UpdateNotesList();
+            }
+            else
+            {
+                Process editor = _editorService.OpenInEditor(clickedItem.FullPath);
+                // Snap this window to the side of the editor we just opened
+                _windowSnapper.Attach(editor.MainWindowHandle);
             }
         }
 

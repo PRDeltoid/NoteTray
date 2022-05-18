@@ -13,6 +13,7 @@ public static class ContainerConfig
         builder.RegisterType<MainWindow>();
         builder.RegisterType<DirectoryManagerService>();
         builder.RegisterType<SQLiteDatabaseService>().As<IDatabaseService>().WithParameter("databaseFileName", "notetray.db");
+        builder.RegisterType<EditorManagerService>();
         builder.RegisterType<UserPreferenceService>();
         
         return builder.Build();
