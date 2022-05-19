@@ -15,6 +15,7 @@ public static class ContainerConfig
         builder.RegisterType<SQLiteDatabaseService>().As<IDatabaseService>().WithParameter("databaseFileName", "notetray.db");
         builder.RegisterType<EditorManagerService>();
         builder.RegisterType<UserPreferenceService>();
+        builder.RegisterType<NoteListViewModel>();
         
         return builder.Build();
     }
