@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 using System.Windows.Threading;
+using Serilog;
 
 namespace NoteTray;
 
@@ -38,14 +39,16 @@ public class WindowSnapper
     private static extern bool IsWindow(IntPtr hwnd);
 
     private readonly DispatcherTimer _timer;
-    private IntPtr _windowHandle;
+    private IntPtr _attachedWindowHandle;
     private Rect _lastBounds;
     private readonly Window _window;
+    private Rect _lastBounds1;
 
     public WindowSnapper(Window window)
     {
         _window = window;
         _window.Topmost = true;
+        
 
         _timer = new DispatcherTimer
         {
@@ -57,33 +60,49 @@ public class WindowSnapper
 
     public void Attach(IntPtr windowHandle)
     {
-        _windowHandle = windowHandle;
+        _attachedWindowHandle = windowHandle;
         _timer.Start();
     }
 
     public void Detach()
     {
+        Log.Debug("WindowSnapper Detaching");
         _timer.Stop();
     }
 
     private void SnapToWindow()
     {
         // Disable the window snapper if the window we are attached to stops existing
-        if (IsWindow(_windowHandle) == false)
+        if (DoesWindowExist(_attachedWindowHandle) == false)
         {
             Detach();
             return;
         }
-        
-        Rect bounds = GetWindowBounds(_windowHandle);
 
+        Rect bounds = GetWindowBounds(_attachedWindowHandle);
+
+        // If the attached window has moved, move the Note Tray so it stays attached to the left side
         if (bounds != _lastBounds)
         {
             _window.Top = bounds.Top;
             _window.Left = bounds.Left - _window.Width;
             _window.Height = bounds.Height;
             _lastBounds = bounds;
+            // Update Note Tray location for use in future calls to SnapToWindow() in the code below
+            _lastBounds1 = GetWindowBounds(_window);;
+            return;
         }
+        
+        // If the Note Tray was moved seperately from its attached window, we assume the user no longer wants the window snapping behavior so we detach
+        if (_lastBounds1 != GetWindowBounds(_window))
+        {
+            Detach();
+        }
+    }
+
+    private static bool DoesWindowExist(IntPtr attachedWindowHandle)
+    {
+        return IsWindow(attachedWindowHandle);
     }
 
     private static Rect GetWindowBounds(IntPtr handle)
@@ -91,5 +110,10 @@ public class WindowSnapper
         Rect bounds = new Rect();
         GetWindowRect(handle, ref bounds);
         return bounds;
+    }
+    
+    private static Rect GetWindowBounds(Window window)
+    {
+        return new Rect() {Top = (int)window.Top, Left = (int)window.Left , Bottom = (int)(window.Top + window.Height) , Right = (int)(window.Left + window.Width)};
     }
 }
