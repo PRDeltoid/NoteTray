@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Serilog;
 
 namespace NoteTray
@@ -26,10 +29,30 @@ namespace NoteTray
         private void OnProcessPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName != "EditorProcess") return;
-            NoteListViewModel viewModel = sender as NoteListViewModel;
+            if (sender is not NoteListViewModel viewModel) return;
             
             Log.Debug("Attaching to editor process: {0}",viewModel.EditorProcess.MainWindowTitle);
             _windowSnapper.Attach(viewModel.EditorProcess.MainWindowHandle);
+        }
+
+        private void Exit_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Preferences_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Settings_MouseLeftDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not Button button) return;
+            
+            // Manually load context since this isn't done automatically when left clicking
+            button.ContextMenu.DataContext = button.DataContext;
+            // Show context menu
+            button.ContextMenu.IsOpen = true;
         }
     }
 }

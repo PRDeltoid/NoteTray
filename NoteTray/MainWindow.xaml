@@ -9,6 +9,12 @@
         Width="300"  MaxWidth="400"
         Background="{StaticResource BaseBrush1}" 
         d:DataContext="{d:DesignInstance }">
+        
+    <Window.Resources>
+
+    </Window.Resources>
+
+    
     <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="35" />
@@ -46,8 +52,16 @@
                 </TextBlock.Style>
             </TextBlock>
             <Button Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}"
-                    BorderBrush="{StaticResource BaseBrush2}" Width="23" Height="23" Grid.Column="1">
-                ...
+                    BorderBrush="{StaticResource BaseBrush2}" Width="23" Height="23" Grid.Column="1"
+                    Content="..."
+                    PreviewMouseLeftButtonDown="Settings_MouseLeftDown" >
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Preferences" Click="Preferences_OnClick"/>
+                        <Separator />
+                        <MenuItem Header="Exit" Click="Exit_OnClick" />
+                    </ContextMenu>
+                </Button.ContextMenu>
             </Button>
         </Grid>
 
