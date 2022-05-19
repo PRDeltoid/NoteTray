@@ -29,8 +29,22 @@
             </Grid.ColumnDefinitions>
 
             <TextBox Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}" Height="23"
-                     Grid.Column="0" VerticalContentAlignment="Center" x:Name="txtSearchbox" Text="Search..."
-                     BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1" />
+                     Grid.Column="0" VerticalContentAlignment="Center" x:Name="txtSearchbox"
+                     BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
+                     Padding="6,0,0,0"/>
+            <!-- Search Hint Text. Automatically disappears when the user starts typing and reappears if no text is present -->
+            <TextBlock IsHitTestVisible="False" Text="Search..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="{StaticResource TextBrush3}">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=txtSearchbox}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <Button Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}"
                     BorderBrush="{StaticResource BaseBrush2}" Width="23" Height="23" Grid.Column="1">
                 ...

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using Serilog;
 
@@ -11,7 +10,7 @@ namespace NoteTray
     public partial class MainWindow : Window
     {
         private readonly WindowSnapper _windowSnapper;
-
+        
         public MainWindow(NoteListViewModel viewModel)
         {
             DataContext = viewModel;
@@ -22,10 +21,6 @@ namespace NoteTray
             
             // Enable window snapping to the viewmodel's Process property
             viewModel.PropertyChanged += OnProcessPropertyChanged;
-
-            // Remove placeholder "Search" text when the user selects the searchbox
-            txtSearchbox.GotFocus += RemoveText;
-            txtSearchbox.LostFocus += AddText;
         }
 
         private void OnProcessPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -35,20 +30,6 @@ namespace NoteTray
             
             Log.Debug("Attaching to editor process: {0}",viewModel.EditorProcess.MainWindowTitle);
             _windowSnapper.Attach(viewModel.EditorProcess.MainWindowHandle);
-        }
-
-        private void RemoveText(object sender, EventArgs e)
-        {
-            if (txtSearchbox.Text == "Search...")
-            {
-                txtSearchbox.Text = "";
-            }
-        }
-
-        private void AddText(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtSearchbox.Text))
-                txtSearchbox.Text = "Search...";
         }
     }
 }

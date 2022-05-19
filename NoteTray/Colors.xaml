@@ -8,9 +8,11 @@
     <Color x:Key="BaseColor6">#93a1a1</Color> 
     <Color x:Key="TextColor1">#eee8d5</Color>   
     <Color x:Key="TextColor2">#fdfde3</Color>   
+    <Color x:Key="TextColor3">#839496</Color>   
     
     <SolidColorBrush x:Key="TextBrush1" Color="{StaticResource TextColor1}" />
     <SolidColorBrush x:Key="TextBrush2" Color="{StaticResource TextColor2}" />
+    <SolidColorBrush x:Key="TextBrush3" Color="{StaticResource TextColor3}" />
     <SolidColorBrush x:Key="BaseBrush1" Color="{StaticResource BaseColor1}" />
     <SolidColorBrush x:Key="BaseBrush2" Color="{StaticResource BaseColor2}" />
     <SolidColorBrush x:Key="BaseBrush3" Color="{StaticResource BaseColor3}" />
