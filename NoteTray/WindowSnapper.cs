@@ -9,7 +9,9 @@ namespace NoteTray;
 
 public class WindowSnapper
 {
+#pragma warning disable CS0660, CS0661
     private struct Rect
+#pragma warning restore CS0660, CS0661
     {
         public int Left { get; set; }
         public int Top { get; set; }
