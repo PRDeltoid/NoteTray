@@ -37,7 +37,8 @@
             <TextBox Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}" Height="23"
                      Grid.Column="0" VerticalContentAlignment="Center" x:Name="txtSearchbox"
                      BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
-                     Padding="6,0,0,0"/>
+                     Padding="6,0,0,0"
+                     PreviewKeyUp="Search_EnterPressed" />
             <!-- Search Hint Text. Automatically disappears when the user starts typing and reappears if no text is present -->
             <TextBlock IsHitTestVisible="False" Text="Search..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="{StaticResource TextBrush3}">
                 <TextBlock.Style>

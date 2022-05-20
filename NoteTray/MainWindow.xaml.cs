@@ -54,5 +54,14 @@ namespace NoteTray
             // Show context menu
             button.ContextMenu.IsOpen = true;
         }
+        
+        private void Search_EnterPressed(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+
+            // your event handler here
+            e.Handled = true;
+            Log.Debug("Enter pressed in search box");
+        }
     }
 }
