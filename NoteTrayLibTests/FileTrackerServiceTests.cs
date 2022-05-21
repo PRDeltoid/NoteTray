@@ -36,7 +36,7 @@ public class FileTrackerServiceTests
                 Path = "/path/to/file/"
             };
             // Exit early if the file is already tracked and up-to-date
-            if (tracker.IsFileTracked(testFile.Path + testFile.FileName, testFile.LastChanged)) continue;
+            if (tracker.IsFileTracked(testFile.FullPath, testFile.LastChanged)) continue;
             
             tracker.TrackFile(testFile); 
         }
