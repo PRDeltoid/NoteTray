@@ -56,4 +56,20 @@ public class DirectoryManagerService
         _directory = parentDir.FullPath;
         return true;
     }
+
+    public void DoToEachFile(string dir, bool recursive, Action<NoteListItem> action)
+    {
+        foreach (NoteListItem item in DirectoryUtilities.GetChildFiles(dir))
+        {
+            action.Invoke(item);
+        }
+
+        if (recursive)
+        {
+            foreach (NoteListItem item in DirectoryUtilities.GetChildDirectories(dir))
+            {
+                DoToEachFile(item.FullPath, true, action);
+            } 
+        }
+    }
 }
