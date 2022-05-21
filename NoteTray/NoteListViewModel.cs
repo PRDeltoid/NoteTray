@@ -38,15 +38,34 @@ public class NoteListViewModel : INotifyPropertyChanged
         }
     }
 
-    public NoteListViewModel(DirectoryManagerService directoryService, EditorManagerService editorService)
+    public NoteListViewModel(DirectoryManagerService directoryService, EditorManagerService editorService, IFullTextSearchService searchService)
     {
         _directoryService = directoryService;
         _editorService = editorService;
 
         // If the SelectedNote property changes, run the Item Selection code
         PropertyChanged += OnItemSelected;
-
+        
+        // Bind to the search service so we can update the note list when a search is performed
+        searchService.SearchResultsAvailable += SearchResultsAvailable;
+            
         UpdateNotesList();
+    }
+
+    private void SearchResultsAvailable(object sender, SearchResultEventArgs e)
+    {
+        NoteList.Clear(); 
+        foreach (SearchResultModel result in e.Results)
+        {
+            NoteListItem note = new NoteListItem()
+            {
+                FullPath = result.FullPath,
+                IsDirectory = false, // search only returns files for now
+                Name = result.Name
+            };
+            NoteList.Add(note); 
+        }
+        OnPropertyChanged(nameof(NoteList));
     }
 
     private void OnItemSelected(object sender, PropertyChangedEventArgs e)
