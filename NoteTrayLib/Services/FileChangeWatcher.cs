@@ -44,6 +44,8 @@ public class FileChangeWatcher
 
     private void OnRenamed(object sender, RenamedEventArgs e)
     {
+        if (IsFileHidden(e.FullPath)) return;
+        
         Log.Debug("FileTrackerService OnRenamed event occurred: {path}", e.FullPath);
         _trackerService.RemoveFile(e.OldFullPath);
         TrackedFileModel file = FileTrackerUtilities.TrackedFileModelFromPath(e.FullPath);
@@ -64,8 +66,15 @@ public class FileChangeWatcher
 
     private void OnChanged(object sender, FileSystemEventArgs e)
     {
+        if (IsFileHidden(e.FullPath)) return;
+        
         Log.Debug("FileTrackerService OnChanged event occurred: {path}", e.FullPath);
         TrackedFileModel file = FileTrackerUtilities.TrackedFileModelFromPath(e.FullPath);
         _trackerService.TrackFile(file);
+    }
+    
+    private static bool IsFileHidden(string fullPath)
+    {
+        return File.GetAttributes(fullPath).HasFlag(FileAttributes.Hidden);;
     }
 }
