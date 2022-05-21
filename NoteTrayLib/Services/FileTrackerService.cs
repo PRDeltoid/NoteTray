@@ -8,6 +8,9 @@ public class FileTrackerService
     private const string TableName = "filetracking";
     private readonly IDatabaseService _database;
 
+    public IEnumerable<TrackedFileModel> TrackedFiles =>
+        _database.ExecuteQuery<TrackedFileModel>($"SELECT ID, Path, FileName, LastChanged FROM {TableName}");
+
     public FileTrackerService(IDatabaseService database)
     {
         _database = database;
@@ -50,6 +53,7 @@ public class FileTrackerService
         string path = Path.GetDirectoryName(fullPath);
         string filename = Path.GetFileName(fullPath);
         
+        Log.Debug(@$"SELECT LastChanged FROM {TableName} WHERE FileName = {filename} AND Path = {path}");
         IEnumerable<DateTime> result = _database.ExecuteQuery<DateTime>(
             @$"SELECT LastChanged FROM {TableName} WHERE FileName = @filename AND Path = @path", new { filename, path });
         
