@@ -15,7 +15,7 @@ public class FileTrackerService
     }
 
     public event EventHandler<TrackedFileModel> FileTracked;
-    public event EventHandler<TrackedFileModel> FileRemoved;
+    public event EventHandler<string> FileRemoved;
     
     /// <summary>
     /// Start tracking a file.
@@ -40,24 +40,22 @@ public class FileTrackerService
     }
 
     /// <summary>
-    /// Determines if a file is correctly tracked in the database. This means the LastChanged time in the database matches the file, indicating it has not been altered
+    /// Determines if a file is correctly tracked. This means the LastChanged time in the database matches the file, indicating it has not been altered
     /// </summary>
-    /// <param name="file">The file to check</param>
+    /// <param name="fullPath">The fully qualified path to the file (including the file name)</param>
+    /// <param name="currentLastChanged">The last date changed of the file we are checking</param>
     /// <returns>True if the file is correctly tracked. False if file is not currently tracked or LastChanged time is out-of-date</returns>
-    public bool IsFileTracked(TrackedFileModel file)
+    public bool IsFileTracked(string fullPath, DateTime currentLastChanged)
     {
-        var parameters = new
-        {
-            path = file.Path,
-            filename = file.FileName,
-        };
-
+        string path = Path.GetDirectoryName(fullPath);
+        string filename = Path.GetFileName(fullPath);
+        
         IEnumerable<DateTime> result = _database.ExecuteQuery<DateTime>(
-            @$"SELECT LastChanged FROM {TableName} WHERE FileName = @filename AND Path = @path", parameters);
+            @$"SELECT LastChanged FROM {TableName} WHERE FileName = @filename AND Path = @path", new { filename, path });
         
         if (result.Any())
         {
-            return (result.First() == file.LastChanged);
+            return (result.First() == currentLastChanged);
         }
         else
         {
@@ -69,21 +67,19 @@ public class FileTrackerService
     /// <summary>
     /// Remove a files tracking information
     /// </summary>
-    /// <param name="file">The file to remove</param>
+    /// <param name="fullPath">The fully qualified path to the file (including the file name)</param>
     /// <returns>True if a file was successfully removed. False otherwise. Failure may indicate that the file tracking information does not exist or the database is having other issues</returns>
-    public bool RemoveFile(TrackedFileModel file)
+    public bool RemoveFile(string fullPath)
     {
-        var parameters = new
-        {
-            name = file.FileName,
-            path = file.Path
-        };
-            
-        Log.Debug($@"DELETE FROM {TableName} WHERE FileName = {file.FileName} AND Path={file.Path}");
-        int rows = _database.ExecuteNonQuery($@"DELETE FROM {TableName} WHERE FileName = @name AND Path=path", parameters);
+        string path = Path.GetDirectoryName(fullPath);
+        string filename = Path.GetFileName(fullPath);
+        
+        Log.Debug($@"DELETE FROM {TableName} WHERE FileName={filename} AND Path={path}");
+        
+        int rows = _database.ExecuteNonQuery($@"DELETE FROM {TableName} WHERE FileName=@filename AND Path=@path", new { filename, path });
         if (rows > 0)
         {
-            FileRemoved?.Invoke(this, file);
+            FileRemoved?.Invoke(this, fullPath);
             return true;
         }
         else
@@ -99,14 +95,13 @@ public class FileTrackerService
                                           Path TEXT,
                                           FileName TEXT,
                                           LastChanged TEXT,
-                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE);
-            )");
+                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE");
         _database.ExecuteNonQuery(
             @$"CREATE TABLE IF NOT EXISTS {TableName}(
                                           ID INTEGER PRIMARY KEY,
                                           Path TEXT,
                                           FileName TEXT,
                                           LastChanged TEXT,
-                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE);)");
+                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE");
     }
 }

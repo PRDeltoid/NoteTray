@@ -36,7 +36,7 @@ public class FileTrackerServiceTests
                 Path = "/path/to/file/"
             };
             // Exit early if the file is already tracked and up-to-date
-            if (tracker.IsFileTracked(testFile)) continue;
+            if (tracker.IsFileTracked(testFile.Path + testFile.FileName, testFile.LastChanged)) continue;
             
             tracker.TrackFile(testFile); 
         }
@@ -46,11 +46,6 @@ public class FileTrackerServiceTests
     public void RemoveFileTest()
     {
         FileTrackerService tracker = new FileTrackerService(_database);
-        TrackedFileModel testFile = new TrackedFileModel()
-        {
-            FileName = "TestFile1.txt",
-            Path = "/path/to/file/"
-        };
-        Assert.IsTrue(tracker.RemoveFile(testFile)); 
+        Assert.IsTrue(tracker.RemoveFile("/path/to/file/TestFile1.txt")); 
     }
 }
