@@ -14,7 +14,6 @@ namespace NoteTray
 
         public App()
         {
-            _container = ContainerConfig.CreateContainer();
             using Logger log = new LoggerConfiguration()
                 .WriteTo.Debug()
                 #if DEBUG
@@ -22,12 +21,18 @@ namespace NoteTray
                 #endif
                 .CreateLogger();
             Log.Logger = log;
+            _container = ContainerConfig.CreateContainer();
         }
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
             MainWindow mainForm = _container.Resolve<MainWindow>();
             mainForm.Show();
+        }
+
+        private void OnExit(object sender, ExitEventArgs e)
+        {
+            Log.CloseAndFlush();
         }
     }
 }
