@@ -21,6 +21,8 @@ public class LuceneFullTextSearchService : IFullTextSearchService
     private readonly Analyzer _standardAnalyzer;
     private readonly QueryParser _queryParser;
 
+    public event EventHandler<SearchResultEventArgs> SearchResultsAvailable; 
+
     public LuceneFullTextSearchService(FileTrackerService fileTracker, string indexName)
     {
         fileTracker.FileTracked += FileTrackerOnFileTracked;
@@ -58,23 +60,44 @@ public class LuceneFullTextSearchService : IFullTextSearchService
         _writer.Commit();
     }
 
-    public void Search(string text)
+    public IEnumerable<SearchResultModel> Search(string text)
     {
         // Parse the user's query text
         Query query = _queryParser.Parse(text);
         
+        Log.Information("Search query: {query}", text);
+        
         // Search
         using DirectoryReader reader = _writer.GetReader(applyAllDeletes: true);
         IndexSearcher searcher = new IndexSearcher(reader);
-        TopDocs topDocs = searcher.Search(query, n: 2);
+        TopDocs topDocs = searcher.Search(query, n: 20);
 
+        List<SearchResultModel> results = new List<SearchResultModel>();
+        
         // Show results
-        Document resultDoc = searcher.Doc(topDocs.ScoreDocs[0].Doc);
-        string title = resultDoc.Get("name");
+        foreach (ScoreDoc scoreDoc in topDocs.ScoreDocs)
+        {
+            // Find the actual document from the score doc data
+            Document resultDoc = searcher.Doc(scoreDoc.Doc);
+            // Extract the important info from the index
+            string name = resultDoc.Get("name");
+            string fullPath = Path.Combine(resultDoc.Get("path", name));
+            
+            // parse it as a search result
+            SearchResultModel result = new SearchResultModel()
+            {
+                FullPath = fullPath,
+                Name = name,
+                SearchScore = scoreDoc.Score
+            };
+            
+            results.Add(result);
+        }
 
         Log.Information($"Matching results: {topDocs.TotalHits}");
-        Log.Information($"Title of first result: {title}");
-        // TODO: Return something
+        
+        SearchResultsAvailable?.Invoke(this, new SearchResultEventArgs(text, results));
+        return results;
     }
     
     public void IndexFile(string filePath)
