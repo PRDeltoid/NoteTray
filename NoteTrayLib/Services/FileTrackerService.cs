@@ -53,7 +53,7 @@ public class FileTrackerService
         string path = Path.GetDirectoryName(fullPath);
         string filename = Path.GetFileName(fullPath);
         
-        Log.Debug(@$"SELECT LastChanged FROM {TableName} WHERE FileName = {filename} AND Path = {path}");
+        // Log.Debug(@$"SELECT LastChanged FROM {TableName} WHERE FileName = {filename} AND Path = {path}");
         IEnumerable<DateTime> result = _database.ExecuteQuery<DateTime>(
             @$"SELECT LastChanged FROM {TableName} WHERE FileName = @filename AND Path = @path", new { filename, path });
         
