@@ -99,13 +99,13 @@ public class FileTrackerService
                                           Path TEXT,
                                           FileName TEXT,
                                           LastChanged TEXT,
-                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE");
+                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE)");
         _database.ExecuteNonQuery(
             @$"CREATE TABLE IF NOT EXISTS {TableName}(
                                           ID INTEGER PRIMARY KEY,
                                           Path TEXT,
                                           FileName TEXT,
                                           LastChanged TEXT,
-                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE");
+                                          UNIQUE(Path, FileName) ON CONFLICT REPLACE)");
     }
 }
