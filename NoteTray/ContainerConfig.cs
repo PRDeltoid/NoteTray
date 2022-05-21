@@ -23,6 +23,7 @@ public static class ContainerConfig
         builder.RegisterType<StartupScanService>();
         builder.RegisterType<FirstTimeSetupService>();
         builder.RegisterType<LuceneFullTextSearchService>().As<IFullTextSearchService>().WithParameter("indexName", "searchindex").SingleInstance();
+        builder.RegisterType<StartupService>().AutoActivate(); // do some stuff at startup
 
         return builder.Build();
     }
