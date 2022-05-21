@@ -14,4 +14,14 @@ public static class FileTrackerUtilities
             LastChanged = fileInfo.LastWriteTime
         };
     }
+
+    public static TrackedFileModel TrackedFileModelFromNoteListItem(NoteListItem noteListItem)
+    {
+        return new TrackedFileModel()
+        {
+            FileName = Path.GetFileName(noteListItem.FullPath),
+            Path = Path.GetDirectoryName(noteListItem.FullPath),
+            LastChanged = File.GetLastWriteTime(noteListItem.FullPath)
+        };
+    }
 }
