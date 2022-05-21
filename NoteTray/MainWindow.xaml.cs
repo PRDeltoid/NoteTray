@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using NoteTrayLib.Services;
 using Serilog;
 
 namespace NoteTray
@@ -12,10 +13,17 @@ namespace NoteTray
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly IFullTextSearchService _searchService;
         private readonly WindowSnapper _windowSnapper;
         
-        public MainWindow(NoteListViewModel viewModel)
+        public MainWindow(NoteListViewModel viewModel, StartupScanService startupScanner, FirstTimeSetupService firstTimeSetup, IFullTextSearchService searchService)
         {
+            _searchService = searchService;
+            // Initial setup
+            // TODO: Should either one of these be moved elsewhere? AutoActivate maybe? StartUp glue class with autoactivate?
+            firstTimeSetup.Setup();
+            startupScanner.Scan();
+            
             DataContext = viewModel;
             // Window Snapper is used to attach this window to the side of another process and keep it there
             // This is used when the ViewModel opens an editor process
@@ -59,9 +67,10 @@ namespace NoteTray
         {
             if (e.Key != Key.Enter) return;
 
-            // your event handler here
             e.Handled = true;
             Log.Debug("Enter pressed in search box");
+            
+            _searchService.Search(txtSearchbox.Text);
         }
     }
 }
