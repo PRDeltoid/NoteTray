@@ -15,7 +15,7 @@ public static class ContainerConfig
         builder.RegisterType<SQLiteDatabaseService>().As<IDatabaseService>()
             .WithParameter("databaseFileName", "notetray.db");
         builder.RegisterType<EditorManagerService>();
-        builder.RegisterType<UserPreferenceService>();
+        builder.RegisterType<UserPreferenceService>().SingleInstance();
         builder.RegisterType<NoteListViewModel>();
         builder.RegisterType<FileTrackerService>().SingleInstance();
         builder.RegisterType<FileChangeWatcher>().WithParameter("includeSubdirectories", true).SingleInstance()
