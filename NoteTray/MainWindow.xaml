@@ -19,6 +19,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <!-- Top Bar (Search, Menu) -->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -41,8 +42,10 @@
             <TextBlock Grid.Column="0" IsHitTestVisible="False" Text="Search..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="{StaticResource TextBrush3}">
                 <TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}">
+                        <!-- Default visibility of the hint is collapsed/hidden -->
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
+                            <!-- If the value if the textbox becomes an empty string, show the hint text -->
                             <DataTrigger Binding="{Binding Text, ElementName=txtSearchbox}" Value="">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
@@ -86,7 +89,7 @@
                     PreviewMouseLeftButtonDown="Settings_MouseLeftDown" >
                 <Button.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Preferences" Click="Preferences_OnClick"/>
+                        <MenuItem Header="Preferences" Click="Preferences_OnClick" />
                         <Separator />
                         <MenuItem Header="Exit" Click="Exit_OnClick" />
                     </ContextMenu>
