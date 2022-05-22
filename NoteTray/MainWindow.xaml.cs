@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using NoteTray.Commands;
 using Serilog;
 
 namespace NoteTray
@@ -13,10 +14,13 @@ namespace NoteTray
     public partial class MainWindow : Window
     {
         private readonly WindowSnapper _windowSnapper;
+
+        public ICommand OpenPreferencesCommand { get; set; }
         
-        public MainWindow(NoteListViewModel viewModel)
+        public MainWindow(NoteListViewModel viewModel, OpenPreferencesCommand preferencesCommand)
         {
             DataContext = viewModel;
+            OpenPreferencesCommand = preferencesCommand;
 
             // Window Snapper is used to attach this window to the side of another process and keep it there
             // This is used when the ViewModel opens an editor process
@@ -43,7 +47,7 @@ namespace NoteTray
 
         private void Preferences_OnClick(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            OpenPreferencesCommand.Execute(this);
         }
 
         private void Settings_MouseLeftDown(object sender, MouseButtonEventArgs e)
