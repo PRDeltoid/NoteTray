@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using NoteTrayLib.Services;
 using Serilog;
 
 namespace NoteTray
@@ -13,14 +12,12 @@ namespace NoteTray
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IFullTextSearchService _searchService;
         private readonly WindowSnapper _windowSnapper;
         
-        public MainWindow(NoteListViewModel viewModel, IFullTextSearchService searchService)
+        public MainWindow(NoteListViewModel viewModel)
         {
             DataContext = viewModel;
 
-            _searchService = searchService;
             // Window Snapper is used to attach this window to the side of another process and keep it there
             // This is used when the ViewModel opens an editor process
             _windowSnapper = new WindowSnapper(this);
@@ -57,17 +54,6 @@ namespace NoteTray
             button.ContextMenu.DataContext = button.DataContext;
             // Show context menu
             button.ContextMenu.IsOpen = true;
-        }
-        
-        private void Search_EnterPressed(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter || txtSearchbox.Text == "") return;
-
-            e.Handled = true;
-            Log.Debug("Enter pressed in search box");
-            
-            // MainWindow just starts the search. Handling the results is the job of the NoteListViewModel
-            _searchService.Search(txtSearchbox.Text);
         }
     }
 }

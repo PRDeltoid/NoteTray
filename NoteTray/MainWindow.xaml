@@ -9,12 +9,6 @@
         Width="300"  MaxWidth="400"
         Background="{StaticResource BaseBrush1}" 
         d:DataContext="{d:DesignInstance }">
-        
-    <Window.Resources>
-
-    </Window.Resources>
-
-    
     <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="35" />
@@ -34,13 +28,17 @@
                 <ColumnDefinition Width="25" />
             </Grid.ColumnDefinitions>
 
+            <!-- Search bar -->
             <TextBox Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}" Height="23"
                      Grid.Column="0" VerticalContentAlignment="Center" x:Name="txtSearchbox"
-                     BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
-                     Padding="6,0,0,0"
-                     PreviewKeyUp="Search_EnterPressed" />
+                     BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1" Padding="6,0,0,0"
+                     Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding Path=PerformSearchCommand}" Key="Enter" />
+                </TextBox.InputBindings>
+            </TextBox>
             <!-- Search Hint Text. Automatically disappears when the user starts typing and reappears if no text is present -->
-            <TextBlock IsHitTestVisible="False" Text="Search..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="{StaticResource TextBrush3}">
+            <TextBlock Grid.Column="0" IsHitTestVisible="False" Text="Search..." VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="{StaticResource TextBrush3}">
                 <TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}">
                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -52,6 +50,36 @@
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
+            <!-- Search Bar Clear Button -->
+            <Button Grid.Column="0" Content="x" IsHitTestVisible="True" VerticalAlignment="Center" HorizontalAlignment="Right" 
+                    Foreground="{StaticResource BaseBrush3}" Margin="2" Width="17" Height="17" 
+                    Command="{Binding ClearSearchCommand}" > 
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Ellipse Stroke="{StaticResource BaseBrush3}"
+                                     StrokeThickness="2">
+                                <Ellipse.Fill>
+                                    <StaticResource ResourceKey="BaseBrush2" />
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Top"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=txtSearchbox}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <!-- Menu Button -->
             <Button Background="{StaticResource BaseBrush1}" Foreground="{StaticResource TextBrush1}"
                     BorderBrush="{StaticResource BaseBrush2}" Width="23" Height="23" Grid.Column="1"
                     Content="..."
@@ -66,6 +94,7 @@
             </Button>
         </Grid>
 
+        <!-- Note List -->
         <ListBox Grid.Row="1" Margin="1 0" Background="{StaticResource BaseBrush2}" Foreground="{StaticResource TextBrush1}" 
                  x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
                  ItemsSource="{Binding NoteList, Mode=OneWay}" SelectedItem="{Binding SelectedNote}">

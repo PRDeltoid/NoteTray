@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Input;
+using NoteTray.Commands;
 using NoteTrayLib.Models;
 using NoteTrayLib.Services;
 using Serilog;
@@ -11,11 +13,17 @@ public class NoteListViewModel : INotifyPropertyChanged
 {
     private readonly DirectoryManagerService _directoryService;
     private readonly EditorManagerService _editorService;
+    private readonly IFullTextSearchService _searchService;
 
     private NoteListItem _selectedNote;
 
     private Process _editorProcess;
-    
+    private bool _showingSearchResults = false;
+    private string _searchString;
+
+    public ICommand ClearSearchCommand { get; }
+    public ICommand PerformSearchCommand { get; }
+
     public Process EditorProcess
     {
         get => _editorProcess;
@@ -38,16 +46,31 @@ public class NoteListViewModel : INotifyPropertyChanged
         }
     }
 
+    public string SearchString
+    {
+        get => _searchString;
+        set
+        {
+            _searchString = value;
+            OnPropertyChanged(nameof(SearchString));
+        }
+    }
+
     public NoteListViewModel(DirectoryManagerService directoryService, EditorManagerService editorService, IFullTextSearchService searchService)
     {
         _directoryService = directoryService;
         _editorService = editorService;
+        _searchService = searchService;
+        
+        // Command setup
+        ClearSearchCommand = new ClearSearchCommand(ClearSearch);
+        PerformSearchCommand = new PerformSearchCommand(PerformSearch);
 
         // If the SelectedNote property changes, run the Item Selection code
         PropertyChanged += OnItemSelected;
         
         // Bind to the search service so we can update the note list when a search is performed
-        searchService.SearchResultsAvailable += SearchResultsAvailable;
+        _searchService.SearchResultsAvailable += SearchResultsAvailable;
             
         UpdateNotesList();
     }
@@ -65,6 +88,7 @@ public class NoteListViewModel : INotifyPropertyChanged
             };
             NoteList.Add(note); 
         }
+        _showingSearchResults = true;
         OnPropertyChanged(nameof(NoteList));
     }
 
@@ -84,6 +108,22 @@ public class NoteListViewModel : INotifyPropertyChanged
         {
             EditorProcess = _editorService.OpenInEditor(SelectedNote.FullPath);
         }
+    }
+
+    private void ClearSearch()
+    {
+        SearchString = "";
+        // If we're showing search results, go back to regular directory results instead
+        if (_showingSearchResults)
+        {
+            Log.Debug("Switching note list view from search results to directory results");
+            UpdateNotesList();
+        }
+    }
+
+    private void PerformSearch()
+    {
+        _searchService.Search(SearchString); 
     }
     
     private void UpdateNotesList()
@@ -106,6 +146,7 @@ public class NoteListViewModel : INotifyPropertyChanged
             NoteList.Add(fileitem);
         }
 
+        _showingSearchResults = false;
         OnPropertyChanged(nameof(NoteList));
     }
     
