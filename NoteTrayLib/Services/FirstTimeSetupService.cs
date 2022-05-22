@@ -12,9 +12,9 @@ public class FirstTimeSetupService
     {
         _searchService = searchService;
         _userPrefs = userPrefs;
-        if (_userPrefs.TryGetPreference<bool>("firstRun", out _firstRun) == false)
+        if (_userPrefs.FirstRunFlag == null)
         {
-            _userPrefs.SetPreference("firstRun", true);
+            _userPrefs.FirstRunFlag = true;
             _firstRun = true;
         }; 
     }
@@ -26,14 +26,15 @@ public class FirstTimeSetupService
             Log.Debug("Performing first time setup");
 
             // Build the initial search index from our base path
-            if (_userPrefs.TryGetPreference("basePath", out string basePath))
+            if (_userPrefs.BasePath != null)
             {
                 // Flush the index before building to remove any old data
-                _searchService.BuildIndex(basePath, true);
+                _searchService.BuildIndex(_userPrefs.BasePath, true);
             }
             
             // Disable future "first runs"
-            _userPrefs.SetPreference("firstRun", false);
+            _userPrefs.FirstRunFlag = false;
+            
             // Prevent any further calls this session
             _firstRun = false;
         }
@@ -42,7 +43,7 @@ public class FirstTimeSetupService
     public void Reset()
     {
         Log.Debug("Resetting first time setup status");
-        _userPrefs.SetPreference("firstRun", true);
+        _userPrefs.FirstRunFlag = true;
         _firstRun = true; 
     }
 }

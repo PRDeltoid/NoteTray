@@ -10,10 +10,7 @@ public class EditorManagerService
 
     public EditorManagerService(UserPreferenceService userPreferences)
     {
-        if (userPreferences.TryGetPreference("editCommandTemplate", out _editCommandTemplate) == false)
-        {
-            _editCommandTemplate = @"Notepad.exe ""{0}""";
-        }
+        _editCommandTemplate = userPreferences.EditorCommand ?? @"Notepad.exe ""{0}""";
     }
 
     public Process OpenInEditor(string fullPath)

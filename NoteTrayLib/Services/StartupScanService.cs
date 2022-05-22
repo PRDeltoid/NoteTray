@@ -15,11 +15,8 @@ public class StartupScanService
         _trackerService = trackerService;
         _directoryManagerService = directoryManagerService;
 
-        if (userPrefs.TryGetPreference("basePath", out _basePath) == false)
-        {
-            // TODO: Handle this better? Is there a safe default?
-            throw new Exception("No basePath found for StartupScanService to scan");
-        };
+        // TODO: Handle this better? Is there a safe default?
+        _basePath = userPrefs.BasePath ?? throw new Exception("No basePath found for FileChangeWatcher to watch"); 
     }
     
     public void Scan()

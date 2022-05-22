@@ -13,11 +13,8 @@ public class FileChangeWatcher
     {
         _trackerService = trackerService;
         
-        if (userPrefs.TryGetPreference("basePath", out string basePath) == false)
-        {
-            // TODO: Handle this better? Is there a safe default?
-            throw new Exception("No basePath found for FileChangeWatcher to watch");
-        }
+        // TODO: Handle this better? Is there a safe default?
+        string basePath = userPrefs.BasePath ?? throw new Exception("No basePath found for FileChangeWatcher to watch"); 
         
         _watcher = new FileSystemWatcher(basePath);
 

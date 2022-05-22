@@ -14,12 +14,14 @@ public class DirectoryManagerService
     {
         // Get the user's base note directory
         // If no preference exists, use the User Profile directory
-        if (userPreferences.TryGetPreference("basePath", out _directory) == false)
+        if (userPreferences.BasePath == null)
         {
             string userProfilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            userPreferences.SetPreference("basePath", userProfilePath);
+            userPreferences.BasePath = userProfilePath;
             _directory = userProfilePath;
         }
+
+        _directory = userPreferences.BasePath;
 
         _rootPath = _directory;
     }

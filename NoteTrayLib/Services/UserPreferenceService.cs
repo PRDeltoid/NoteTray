@@ -1,51 +1,71 @@
-﻿using Serilog;
-
-namespace NoteTrayLib.Services;
+﻿namespace NoteTrayLib.Services;
 
 public class UserPreferenceService
 {
-    private const string TableName = "preferences";
-    private readonly IDatabaseService _database;
+	private const string BASE_PATH = "basePath";
+	private const string EDIT_COMMAND_TEMPLATE = "editCommandTemplate";
+	private const string NOTE_FILTER_FILTER = "noteFileFilter";
+	private const string FIRST_RUN_FLAG = "firstRunFlag";
 
-    public UserPreferenceService(IDatabaseService database)
-    {
-        _database = database;
-        CreatePreferenceTableIfAbsent();
-    }
+	private readonly UserPreferenceDbService _prefDbService;
 
-    public bool TryGetPreference<T>(string prefKey, out T value)
-    {
-        Log.Debug($@"SELECT Value FROM {TableName} WHERE Name='{prefKey}'");
-        var parameters = new { name = prefKey };
-        IEnumerable<T> pref = _database.ExecuteQuery<T>($@"SELECT Value FROM {TableName} WHERE Name=@name", parameters);
+	public UserPreferenceService(UserPreferenceDbService prefDbService)
+	{
+		_prefDbService = prefDbService;
+	}
+	public string BasePath
+	{
+		get => TryGetOrNull<string>(BASE_PATH);
+		set => Set(BASE_PATH, value);
+	}
 
-        if (pref.Any())
-        {
-            value = pref.First();
-            return true;
-        }
+	public string EditorCommand
+	{
+		get => TryGetOrNull<string>(EDIT_COMMAND_TEMPLATE);
+		set => Set(EDIT_COMMAND_TEMPLATE, value);
+	}
+		
+	public string NoteFileFilter
+	{
+		get => TryGetOrNull<string>(NOTE_FILTER_FILTER);
+		set => Set(NOTE_FILTER_FILTER, value);
+	}
+	
+	public bool? FirstRunFlag
+	{
+		get => TryGetStructOrNull<bool>(FIRST_RUN_FLAG);
+		set => Set(FIRST_RUN_FLAG, value);
+	}
 
-        value = default;
-        return false;
-    }
+	private void Set(string prefName, object val)
+	{
+		_prefDbService.SetPreference(prefName, val);
+	}
 
-    public void SetPreference<T>(string prefKey, T value)
-    {
-        Log.Debug($@"INSERT INTO {TableName}(Name, Value) VALUES({prefKey}, {value}) ON CONFLICT(Name) DO UPDATE SET Value='{value}'");
-        var parameters = new { value, name = prefKey };
-        _database.ExecuteNonQuery($@"INSERT INTO {TableName}(Name, Value) VALUES(@name, @value) ON CONFLICT(Name) DO UPDATE SET Value=@value", parameters);
-    }
-
-    private void CreatePreferenceTableIfAbsent()
-    {
-        Log.Debug($@"CREATE TABLE IF NOT EXISTS {TableName}(
-            Name TEXT PRIMARY KEY,
-            Value TEXT
-            )");
-        _database.ExecuteNonQuery(
-            @$"CREATE TABLE IF NOT EXISTS {TableName}(
-                Name TEXT PRIMARY KEY,
-                Value TEXT
-              )");
-    }
+	private T TryGetOrNull<T>(string prefName) where T : class
+	{
+		if (_prefDbService.TryGetPreference(prefName, out T returnVal))
+		{
+			return returnVal;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/// <summary>
+	/// Special implementation needed for accepting structs and returning nullable structs
+	/// </summary>
+	private T? TryGetStructOrNull<T>(string prefName) where T : struct
+	{
+		if (_prefDbService.TryGetPreference(prefName, out T returnVal))
+		{
+			return returnVal;
+		}
+		else
+		{
+			return null;
+		}
+	}
 }
