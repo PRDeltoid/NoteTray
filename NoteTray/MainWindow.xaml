@@ -111,7 +111,8 @@
         <!-- Note List -->
         <ListBox Grid.Row="1" Margin="1 0" Background="{StaticResource BaseBrush2}" Foreground="{StaticResource TextBrush1}" 
                  x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
-                 ItemsSource="{Binding Source={StaticResource noteListViewSource}}" >
+                 ItemsSource="{Binding Source={StaticResource noteListViewSource}}" 
+                 IsSynchronizedWithCurrentItem="False" SelectedItem="{Binding SelectedNote}">
             <ListBox.ItemTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
