@@ -3,12 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="Note Tray"
         Height="650" MaxHeight="850"
         Width="300"  MaxWidth="400"
         Background="{StaticResource BaseBrush1}" 
         d:DataContext="{d:DesignInstance }">
+    
+    <Window.Resources>
+        <CollectionViewSource Source="{Binding NoteList}" x:Key="noteListViewSource">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="IsDirectory" Direction="Descending"/>
+                <componentModel:SortDescription PropertyName="Name"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
+    
     <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="35" />
@@ -100,7 +111,7 @@
         <!-- Note List -->
         <ListBox Grid.Row="1" Margin="1 0" Background="{StaticResource BaseBrush2}" Foreground="{StaticResource TextBrush1}" 
                  x:Name="lstNoteFiles" BorderBrush="{StaticResource BaseBrush2}" BorderThickness="1"
-                 ItemsSource="{Binding NoteList, Mode=OneWay}" SelectedItem="{Binding SelectedNote}">
+                 ItemsSource="{Binding Source={StaticResource noteListViewSource}}" >
             <ListBox.ItemTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
