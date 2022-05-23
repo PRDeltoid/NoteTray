@@ -1,6 +1,8 @@
-﻿namespace NoteTrayLib.Services;
+﻿using System.ComponentModel;
 
-public class UserPreferenceService
+namespace NoteTrayLib.Services;
+
+public class UserPreferenceService : INotifyPropertyChanged
 {
 	private const string BASE_PATH = "basePath";
 	private const string EDIT_COMMAND_TEMPLATE = "editCommandTemplate";
@@ -40,6 +42,7 @@ public class UserPreferenceService
 	private void Set(string prefName, object val)
 	{
 		_prefDbService.SetPreference(prefName, val);
+		OnPropertyChanged(prefName);
 	}
 
 	private T TryGetOrNull<T>(string prefName) where T : class
@@ -67,5 +70,12 @@ public class UserPreferenceService
 		{
 			return null;
 		}
+	}
+
+	public event PropertyChangedEventHandler PropertyChanged;
+
+	protected virtual void OnPropertyChanged(string propertyName = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }
