@@ -6,7 +6,7 @@ namespace NoteTrayLibTests;
 [TestFixture]
 public class LuceneFullTextSearchServiceTests
 {
-    private LuceneFullTextSearchService _searchService = new LuceneFullTextSearchService(new FileTrackerService(new SQLiteDatabaseService("testdb")), "searchindex");
+    private readonly LuceneFullTextSearchService _searchService = new LuceneFullTextSearchService(new FileTrackerService(new SQLiteDatabaseService("testdb")), new UserPreferenceService(new UserPreferenceDbService(new SQLiteDatabaseService("testdb"))), "searchindex");
     
     [Test]
     public void BuildIndexTest()

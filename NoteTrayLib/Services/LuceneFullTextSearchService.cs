@@ -15,6 +15,7 @@ namespace NoteTrayLib.Services;
 
 public class LuceneFullTextSearchService : IFullTextSearchService
 {
+    private readonly UserPreferenceService _userPrefs;
     const LuceneVersion luceneVersion = LuceneVersion.LUCENE_48;
     
     private readonly IndexWriter _writer;
@@ -23,8 +24,9 @@ public class LuceneFullTextSearchService : IFullTextSearchService
 
     public event EventHandler<SearchResultEventArgs> SearchResultsAvailable; 
 
-    public LuceneFullTextSearchService(FileTrackerService fileTracker, string indexName)
+    public LuceneFullTextSearchService(FileTrackerService fileTracker, UserPreferenceService userPrefs, string indexName)
     {
+        _userPrefs = userPrefs;
         fileTracker.FileTracked += FileTrackerOnFileTracked;
         fileTracker.FileRemoved += FileTrackerOnFileRemoved;
         // Compatibility version
@@ -118,7 +120,8 @@ public class LuceneFullTextSearchService : IFullTextSearchService
     
     private void IndexDirectory(string directoryPath, bool recursive)
     {
-        foreach (NoteListItem file in DirectoryUtilities.GetChildFiles(directoryPath))
+        string filter = _userPrefs.NoteFileFilter;
+        foreach (NoteListItem file in DirectoryUtilities.GetChildFiles(directoryPath, filter ?? "*"))
         {
             IndexFile(file.FullPath);
         }

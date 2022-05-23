@@ -1,17 +1,23 @@
-﻿using NoteTrayLib.Models;
+﻿using System.ComponentModel;
+using NoteTrayLib.Models;
 using NoteTrayLib.Utilities;
 
 namespace NoteTrayLib.Services;
 
 public class DirectoryManagerService
 {
+    private readonly UserPreferenceService _userPrefs;
     private readonly string _rootPath;
     private string _directory;
-    
+    private string _fileFilter;
+
     public bool IsRootDirectory => _directory == _rootPath;
+
+    public string CurrentDirectory => _directory;
 
     public DirectoryManagerService(UserPreferenceService userPreferences)
     {
+        _userPrefs = userPreferences;
         // Get the user's base note directory
         // If no preference exists, use the User Profile directory
         if (userPreferences.BasePath == null)
@@ -23,9 +29,17 @@ public class DirectoryManagerService
 
         _directory = userPreferences.BasePath;
 
+        _fileFilter = _userPrefs.NoteFileFilter ?? "*";
+        _userPrefs.PropertyChanged += OnFileFilterChanged;
+
         _rootPath = _directory;
     }
-    
+
+    private void OnFileFilterChanged(object sender, PropertyChangedEventArgs e)
+    {
+        _fileFilter = _userPrefs.NoteFileFilter ?? "*"; 
+    }
+
     public void SetCurrentDirectory(string path)
     {
         _directory = path;
@@ -33,7 +47,7 @@ public class DirectoryManagerService
 
     public IEnumerable<NoteListItem> GetChildFiles()
     {
-        return DirectoryUtilities.GetChildFiles(_directory);
+        return DirectoryUtilities.GetChildFiles(_directory, _fileFilter);
     }
 
     public IEnumerable<NoteListItem> GetChildDirectories()
@@ -61,7 +75,7 @@ public class DirectoryManagerService
 
     public void DoToEachFile(string dir, bool recursive, Action<NoteListItem> action)
     {
-        foreach (NoteListItem item in DirectoryUtilities.GetChildFiles(dir))
+        foreach (NoteListItem item in DirectoryUtilities.GetChildFiles(dir, _fileFilter))
         {
             action.Invoke(item);
         }
