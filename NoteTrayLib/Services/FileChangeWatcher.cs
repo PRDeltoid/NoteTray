@@ -40,7 +40,7 @@ public class FileChangeWatcher
 
     private void OnUserFilterChange(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(_userPrefs.NoteFileFilter)) return;
+        if (e.PropertyName != "noteFileFilter") return;
         ClearWatchers();
         CreateWatchers(_userPrefs.BasePath, _includeSubdirectories, _userPrefs.NoteFileFilter);
     }
@@ -72,6 +72,12 @@ public class FileChangeWatcher
 
     private void ClearWatchers()
     {
+        foreach (FileSystemWatcher fileSystemWatcher in _watchers)
+        {
+            fileSystemWatcher.EnableRaisingEvents = false;
+            fileSystemWatcher.Dispose();
+        }
+
         _watchers.Clear();
     }
 
@@ -102,17 +108,17 @@ public class FileChangeWatcher
     private void OnCreated(object sender, FileSystemEventArgs e)
     {
         // OnCreated is always followed by an OnChanged call so we don't have to do anything here, it'll be caught later
+        if (IsFileHidden(e.FullPath)) return;
+        
         Log.Debug("FileTrackerService OnCreated event occurred: {path}", e.FullPath);
+        TrackedFileModel file = FileTrackerUtilities.TrackedFileModelFromPath(e.FullPath);
+        _trackerService.TrackFile(file);
+        FileAdded?.Invoke(this, file);
     }
 
     private void OnChanged(object sender, FileSystemEventArgs e)
     {
-        if (IsFileHidden(e.FullPath)) return;
-        
         Log.Debug("FileTrackerService OnChanged event occurred: {path}", e.FullPath);
-        TrackedFileModel file = FileTrackerUtilities.TrackedFileModelFromPath(e.FullPath);
-        _trackerService.TrackFile(file);
-        FileAdded?.Invoke(this, file);
     }
     
     private static bool IsFileHidden(string fullPath)

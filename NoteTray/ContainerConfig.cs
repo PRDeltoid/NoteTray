@@ -34,7 +34,7 @@ public static class ContainerConfig
         builder.RegisterType<LuceneFullTextSearchService>().As<IFullTextSearchService>().SingleInstance()
             .WithParameter("indexName", "searchindex");
         builder.RegisterType<StartupService>().AutoActivate(); // do some stuff at startup
-        builder.RegisterType<UserPreferenceService>();
+        builder.RegisterType<UserPreferenceService>().SingleInstance();
         
         return builder.Build();
     }
