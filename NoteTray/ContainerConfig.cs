@@ -27,8 +27,8 @@ public static class ContainerConfig
         builder.RegisterType<UserPreferenceDbService>().SingleInstance();
         builder.RegisterType<FileTrackerService>().SingleInstance();
         builder.RegisterType<FileChangeWatcher>().SingleInstance()
-            .WithParameter("includeSubdirectories", true)
-            .AutoActivate(); // Since this runs in the background, we want it to autostart with the app and run for the entire duration
+            .WithParameter("includeSubdirectories", true);
+            // .AutoActivate(); // Since this runs in the background, we want it to autostart with the app and run for the entire duration
         builder.RegisterType<StartupScanService>();
         builder.RegisterType<FirstTimeSetupService>();
         builder.RegisterType<LuceneFullTextSearchService>().As<IFullTextSearchService>().SingleInstance()

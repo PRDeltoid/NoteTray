@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
 using NoteTray.Commands;
+using NoteTrayLib.Extensions;
 using NoteTrayLib.Models;
 using NoteTrayLib.Services;
 using Serilog;
@@ -56,7 +57,7 @@ public class NoteListViewModel : INotifyPropertyChanged
         }
     }
 
-    public NoteListViewModel(DirectoryManagerService directoryService, EditorManagerService editorService, IFullTextSearchService searchService)
+    public NoteListViewModel(DirectoryManagerService directoryService, EditorManagerService editorService, FileChangeWatcher fileChangeWatcher, IFullTextSearchService searchService)
     {
         _directoryService = directoryService;
         _editorService = editorService;
@@ -71,8 +72,38 @@ public class NoteListViewModel : INotifyPropertyChanged
         
         // Bind to the search service so we can update the note list when a search is performed
         _searchService.SearchResultsAvailable += SearchResultsAvailable;
+        
+        fileChangeWatcher.FileAdded += FileChangeWatcherOnFileAdded;
+        fileChangeWatcher.FileRemoved += FileChangeWatcherOnFileRemoved;
             
         UpdateNotesList();
+    }
+
+    private void FileChangeWatcherOnFileRemoved(object sender, TrackedFileModel e)
+    {
+        // If the file being removed is in the directory we are viewing, remove it to the note list
+        if (e.Path == _directoryService.CurrentDirectory && _showingSearchResults == false)
+        {
+            // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
+            App.Current.Dispatcher.Invoke(delegate
+            {
+                // remove any files where the filename and path match
+                NoteList.Remove(x => x.Name == e.FileName && x.FullPath == e.FullPath);
+            });
+        }
+    }
+
+    private void FileChangeWatcherOnFileAdded(object sender, TrackedFileModel e)
+    {
+        // If the file being added is in the directory we are viewing, add it to the note list
+        if (e.Path == _directoryService.CurrentDirectory && _showingSearchResults == false)
+        {
+            // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
+            App.Current.Dispatcher.Invoke(delegate
+            {
+                NoteList.Add(new NoteListItem() { FullPath = e.FullPath, IsDirectory = false, Name = e.FileName});
+            });
+        }
     }
 
     private void SearchResultsAvailable(object sender, SearchResultEventArgs e)
