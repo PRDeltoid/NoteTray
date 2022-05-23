@@ -23,6 +23,8 @@ public class LuceneFullTextSearchService : IFullTextSearchService
     private readonly QueryParser _queryParser;
 
     public event EventHandler<SearchResultEventArgs> SearchResultsAvailable; 
+    public event EventHandler IndexingStart;
+    public event EventHandler IndexingComplete;
 
     public LuceneFullTextSearchService(FileTrackerService fileTracker, UserPreferenceService userPrefs, string indexName)
     {
@@ -47,19 +49,25 @@ public class LuceneFullTextSearchService : IFullTextSearchService
         _queryParser = new QueryParser(luceneVersion, "content", _standardAnalyzer);
     }
 
-    public void BuildIndex(string searchPath, bool flushIndex)
+    public Task BuildIndex(string searchPath, bool flushIndex)
     {
-        if (flushIndex)
+        Log.Debug("Building Lucene Index");
+        IndexingStart?.Invoke(this, EventArgs.Empty);
+        return Task.Run(() =>
         {
-            // Since this builds a new index, we should delete the old index data
-            _writer.DeleteAll();
-        }
-        
-        // Recursively index searchPath and all subdirectories
-        IndexDirectory(searchPath, true);
+            if (flushIndex)
+            {
+                // Since this builds a new index, we should delete the old index data
+                _writer.DeleteAll();
+            }
 
-        // Flush and commit the index data to the directory
-        _writer.Commit();
+            // Recursively index searchPath and all subdirectories
+            IndexDirectory(searchPath, true);
+
+            // Flush and commit the index data to the directory
+            _writer.Commit();
+            IndexingComplete?.Invoke(this, EventArgs.Empty);
+        });
     }
 
     public IEnumerable<SearchResultModel> Search(string text)
@@ -104,6 +112,7 @@ public class LuceneFullTextSearchService : IFullTextSearchService
     
     public void IndexFile(string filePath)
     {
+        Log.Debug("Indexing {file}", Path.GetFileName(filePath));
         // A crude upsert where the document is replaced if it already exists 
         // Otherwise it is created normally
         BooleanQuery query = ConstructKeyQuery(filePath);
@@ -114,6 +123,7 @@ public class LuceneFullTextSearchService : IFullTextSearchService
 
     public void RemoveFile(string filePath)
     {
+        Log.Debug("Removing {file} from index", Path.GetFileName(filePath));
         BooleanQuery query = ConstructKeyQuery(filePath);
         _writer.DeleteDocuments(query);
     }

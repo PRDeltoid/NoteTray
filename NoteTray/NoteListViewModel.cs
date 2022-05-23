@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using NoteTray.Commands;
 using NoteTrayLib.Extensions;
@@ -75,8 +76,6 @@ public class NoteListViewModel : INotifyPropertyChanged
         
         fileChangeWatcher.FileAdded += FileChangeWatcherOnFileAdded;
         fileChangeWatcher.FileRemoved += FileChangeWatcherOnFileRemoved;
-            
-        UpdateNotesList();
     }
 
     private void FileChangeWatcherOnFileRemoved(object sender, TrackedFileModel e)
@@ -84,12 +83,8 @@ public class NoteListViewModel : INotifyPropertyChanged
         // If the file being removed is in the directory we are viewing, remove it to the note list
         if (e.Path == _directoryService.CurrentDirectory && _showingSearchResults == false)
         {
-            // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
-            App.Current.Dispatcher.Invoke(delegate
-            {
-                // remove any files where the filename and path match
-                NoteList.Remove(x => x.Name == e.FileName && x.FullPath == e.FullPath);
-            });
+            // remove any files where the filename and path match
+            RemoveFromNoteList(e);
         }
     }
 
@@ -98,16 +93,32 @@ public class NoteListViewModel : INotifyPropertyChanged
         // If the file being added is in the directory we are viewing, add it to the note list
         if (e.Path == _directoryService.CurrentDirectory && _showingSearchResults == false)
         {
-            // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
-            App.Current.Dispatcher.Invoke(delegate
-            {
-                NoteList.Add(new NoteListItem() { FullPath = e.FullPath, IsDirectory = false, Name = e.FileName});
-            });
+            AddToNoteList(new NoteListItem() { FullPath = e.FullPath, IsDirectory = false, Name = e.FileName});
         }
+    }
+
+    private void AddToNoteList(NoteListItem itemToAdd)
+    {
+        // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
+        App.Current.Dispatcher.Invoke(delegate
+        {
+            NoteList.Add(itemToAdd);
+        }); 
+    }
+
+    private void RemoveFromNoteList(TrackedFileModel itemToRemove)
+    {
+        // ObservableCollection can only be modied from the same thread it was created so we must use a dispatcher here
+        App.Current.Dispatcher.Invoke(delegate
+        {
+            // remove any files where the filename and path match
+            NoteList.Remove(x => x.Name == itemToRemove.FileName && x.FullPath == itemToRemove.FullPath);
+        }); 
     }
 
     private void SearchResultsAvailable(object sender, SearchResultEventArgs e)
     {
+        Log.Debug("Search Results Available");
         NoteList.Clear(); 
         foreach (SearchResultModel result in e.Results)
         {
@@ -117,7 +128,7 @@ public class NoteListViewModel : INotifyPropertyChanged
                 IsDirectory = false, // search only returns files for now
                 Name = result.Name
             };
-            NoteList.Add(note); 
+            AddToNoteList(note);
         }
         _showingSearchResults = true;
         OnPropertyChanged(nameof(NoteList));
@@ -157,28 +168,33 @@ public class NoteListViewModel : INotifyPropertyChanged
         _searchService.Search(SearchString); 
     }
     
-    private void UpdateNotesList()
+    public Task UpdateNotesList()
     {
-        NoteList.Clear();
-        // If we are not at the root, show the parent directory to allow the user to move up
-        if (_directoryService.IsRootDirectory == false)
+        Log.Debug("Updating NoteListViewModel NoteList");
+        return Task.Run(() =>
         {
-            // Format the name of the item so it reads ".."
-            NoteList.Add(new NoteListItem() { FullPath = _directoryService.GetParent().FullPath, IsDirectory = true, Name = ".."});
-        }
-            
-        // Load a list of directories and files
-        foreach (NoteListItem dirItem in _directoryService.GetChildDirectories())
-        {
-            NoteList.Add(dirItem);
-        }
-        foreach (NoteListItem fileitem in _directoryService.GetChildFiles())
-        {
-            NoteList.Add(fileitem);
-        }
+            NoteList.Clear();
+            // If we are not at the root, show the parent directory to allow the user to move up
+            if (_directoryService.IsRootDirectory == false)
+            {
+                // Format the name of the item so it reads ".."
+                AddToNoteList(new NoteListItem() { FullPath = _directoryService.GetParent().FullPath, IsDirectory = true, Name = ".." });
+            }
 
-        _showingSearchResults = false;
-        OnPropertyChanged(nameof(NoteList));
+            // Load a list of directories and files
+            foreach (NoteListItem dirItem in _directoryService.GetChildDirectories())
+            {
+                AddToNoteList(dirItem);
+            }
+
+            foreach (NoteListItem fileitem in _directoryService.GetChildFiles())
+            {
+                AddToNoteList(fileitem);
+            }
+
+            _showingSearchResults = false;
+            OnPropertyChanged(nameof(NoteList));
+        });
     }
     
     #region INotifyPropertyChanged

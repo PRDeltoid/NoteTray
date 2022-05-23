@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Autofac;
+using NoteTrayLib.Services;
 using Serilog;
 using Serilog.Core;
 
@@ -26,8 +27,11 @@ namespace NoteTray
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            MainWindow mainForm = _container.Resolve<MainWindow>();
-            mainForm.Show();
+            // Do some stuff at startup (async)
+            _container.Resolve<StartupService>().PerformStartup();
+            
+            // Show our starting window
+            _container.Resolve<MainWindow>().Show();
         }
 
         private void OnExit(object sender, ExitEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,13 +16,14 @@ namespace NoteTray
     {
         private readonly WindowSnapper _windowSnapper;
 
-        public ICommand OpenPreferencesCommand { get; set; }
+        public ICommand OpenPreferencesCommand { get; }
         
         public MainWindow(NoteListViewModel viewModel, OpenPreferencesCommand preferencesCommand)
         {
             DataContext = viewModel;
+            Task.Run(viewModel.UpdateNotesList);
             OpenPreferencesCommand = preferencesCommand;
-
+            Log.Debug("Main Window Showing");
             // Window Snapper is used to attach this window to the side of another process and keep it there
             // This is used when the ViewModel opens an editor process
             _windowSnapper = new WindowSnapper(this);

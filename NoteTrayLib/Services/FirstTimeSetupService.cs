@@ -19,25 +19,28 @@ public class FirstTimeSetupService
         }; 
     }
     
-    public void Setup()
+    public Task PerformSetup()
     {
-        if (_firstRun)
+        return Task.Run(() =>
         {
-            Log.Debug("Performing first time setup");
-
-            // Build the initial search index from our base path
-            if (_userPrefs.BasePath != null)
+            if (_firstRun)
             {
-                // Flush the index before building to remove any old data
-                _searchService.BuildIndex(_userPrefs.BasePath, true);
+                Log.Debug("Performing first time setup");
+
+                // Build the initial search index from our base path
+                if (_userPrefs.BasePath != null)
+                {
+                    // Flush the index before building to remove any old data
+                    _searchService.BuildIndex(_userPrefs.BasePath, true);
+                }
+
+                // Disable future "first runs"
+                _userPrefs.FirstRunFlag = false;
+
+                // Prevent any further calls this session
+                _firstRun = false;
             }
-            
-            // Disable future "first runs"
-            _userPrefs.FirstRunFlag = false;
-            
-            // Prevent any further calls this session
-            _firstRun = false;
-        }
+        });
     }
 
     public void Reset()
