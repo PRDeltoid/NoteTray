@@ -5,21 +5,21 @@ namespace NoteTrayLib.Services;
 
 public class EditorManagerService
 {
-    private readonly string _editCommandTemplate;
+    private readonly UserPreferenceService _userPreferences;
     private Process p = new Process();
 
     public EditorManagerService(UserPreferenceService userPreferences)
     {
-        _editCommandTemplate = userPreferences.EditorCommand ?? @"Notepad.exe ""{0}""";
+        _userPreferences = userPreferences;
     }
 
     public Process OpenInEditor(string fullPath)
     {
-        string composedEditCommand = string.Format(_editCommandTemplate, fullPath);
+        string composedEditCommand = string.Format(_userPreferences.EditorCommand ?? @"Notepad.exe ""{0}""", fullPath);
         
         Log.Debug($"Executing command \'{composedEditCommand}\'");
 
-        ProcessStartInfo startInfo = new ProcessStartInfo(composedEditCommand);
+        ProcessStartInfo startInfo = new ProcessStartInfo(composedEditCommand, $"-n \"{fullPath}\"");
 
         p = Process.Start(startInfo);
         // Wait for the process to startup so anything dependent on the process can safely interact with it
