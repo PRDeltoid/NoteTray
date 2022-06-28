@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteTrayLib", "NoteTrayLib\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteTrayLibTests", "NoteTrayLibTests\NoteTrayLibTests.csproj", "{E813399F-A387-42F2-8CED-B194B90FDE3E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowGrabberLib", "WindowGrabberLib\WindowGrabberLib.csproj", "{5867E5D5-30A4-477C-A9E4-47BB001DC562}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowGrabberLibTests", "WindowGrabberLibTests\WindowGrabberLibTests.csproj", "{2D738FBF-A19C-4145-A9FA-0C70C2CAC7AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{E813399F-A387-42F2-8CED-B194B90FDE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E813399F-A387-42F2-8CED-B194B90FDE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E813399F-A387-42F2-8CED-B194B90FDE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5867E5D5-30A4-477C-A9E4-47BB001DC562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5867E5D5-30A4-477C-A9E4-47BB001DC562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5867E5D5-30A4-477C-A9E4-47BB001DC562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5867E5D5-30A4-477C-A9E4-47BB001DC562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D738FBF-A19C-4145-A9FA-0C70C2CAC7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D738FBF-A19C-4145-A9FA-0C70C2CAC7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D738FBF-A19C-4145-A9FA-0C70C2CAC7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D738FBF-A19C-4145-A9FA-0C70C2CAC7AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
