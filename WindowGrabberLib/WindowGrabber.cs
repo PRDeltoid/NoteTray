@@ -68,9 +68,11 @@ public class WindowGrabber
 	// Tracks the window grabber periodic mouse check for cancellation when user clicks
 	private CancellationTokenSource _cancelToken = new CancellationTokenSource();
 	private PeriodicTimer _timer;
+	private readonly Font _font;
 
 	public WindowGrabber()
 	{
+		_font = new Font("Times New Roman", 12.0f);
 		/*
 		 * We have to use a static "_handler" value to pass a delegate into User32 pinvoke calls because:
 		 * "you should not pass a lambda or delegate directly into a Win32 Api call (or any C api call for that matter).
@@ -97,7 +99,7 @@ public class WindowGrabber
 		
 		MouseHook();
 
-		while (await _timer.WaitForNextTickAsync(_cancelToken.Token))
+		while (await _timer.WaitForNextTickAsync())
 		{
 			Point p = GetCursorPosition();
 			// Find the first colliding window with our cursor's position
@@ -134,13 +136,16 @@ public class WindowGrabber
 
 	private void DrawOutline(in Graphics graphics, WindowRectangle window)
 	{
-		graphics.DrawRectangle(Pens.Red, window.Bounds.X, window.Bounds.Y, window.Bounds.Width, window.Bounds.Height);
+		graphics.DrawRectangle(Pens.Cyan, window.Bounds.X, window.Bounds.Y, window.Bounds.Width, window.Bounds.Height);
+		// Render the window title in the top left
+		SizeF sizeOfText = graphics.MeasureString(window.Title, new Font("Arial", 12f));
+		graphics.FillRectangle(Brushes.LightCyan, window.Bounds.X + 8, window.Bounds.Y + 8, sizeOfText.Width, sizeOfText.Height);
+		graphics.DrawString(window.Title, _font, Brushes.Cyan, window.Bounds.X + 8, window.Bounds.Y + 8);
 	}
 	
 	private static Point GetCursorPosition()
 	{
-		POINT p;
-		GetCursorPos(out p);
+		GetCursorPos(out POINT p);
 		return new Point(p.X, p.Y);
 	}
 
@@ -172,7 +177,6 @@ public class WindowGrabber
 			{
 				case MouseMessages.WM_LBUTTONDOWN:
 					Log.Debug("Mouse Click");
-					// _cancelToken.Cancel();
 					_timer?.Dispose();
 					break;
 			}

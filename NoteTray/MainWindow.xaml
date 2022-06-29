@@ -100,6 +100,7 @@
                     PreviewMouseLeftButtonDown="Settings_MouseLeftDown" >
                 <Button.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="Dock" Click="Dock_OnClick" />
                         <MenuItem Header="Preferences" Click="Preferences_OnClick" />
                         <Separator />
                         <MenuItem Header="Exit" Click="Exit_OnClick" />

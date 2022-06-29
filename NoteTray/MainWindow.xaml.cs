@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using NoteTray.Commands;
 using Serilog;
+using WindowGrabberLib;
 
 namespace NoteTray
 {
@@ -15,6 +14,7 @@ namespace NoteTray
     public partial class MainWindow : Window
     {
         private readonly WindowSnapper _windowSnapper;
+        private readonly WindowGrabber _grabber;
 
         public ICommand OpenPreferencesCommand { get; }
         
@@ -27,19 +27,9 @@ namespace NoteTray
             // Window Snapper is used to attach this window to the side of another process and keep it there
             // This is used when the ViewModel opens an editor process
             _windowSnapper = new WindowSnapper(this);
+            // Window Grabber is used to allow the user to select what process they want to snap to
+            _grabber = new WindowGrabber();
             InitializeComponent();
-            
-            // Enable window snapping to the viewmodel's Process property
-            viewModel.PropertyChanged += OnProcessPropertyChanged;
-        }
-
-        private void OnProcessPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName != "EditorProcess") return;
-            if (sender is not NoteListViewModel viewModel) return;
-            
-            Log.Debug("Attaching to editor process: {0}", viewModel.EditorProcess.MainWindowTitle);
-            _windowSnapper.Attach(viewModel.EditorProcess.MainWindowHandle);
         }
 
         private void Exit_OnClick(object sender, RoutedEventArgs e)
@@ -47,6 +37,12 @@ namespace NoteTray
             Close();
         }
 
+        private async void Dock_OnClick(object sender, RoutedEventArgs e)
+        {
+            // Ask the user to select a window and then snap to it
+            _windowSnapper.Attach(await _grabber.GrabWindowAsync());
+        }
+        
         private void Preferences_OnClick(object sender, RoutedEventArgs e)
         {
             OpenPreferencesCommand.Execute(this);

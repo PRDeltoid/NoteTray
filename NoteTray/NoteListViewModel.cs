@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using NoteTray.Commands;
@@ -19,22 +18,11 @@ public class NoteListViewModel : INotifyPropertyChanged
 
     private NoteListItem _selectedNote;
 
-    private Process _editorProcess;
     private bool _showingSearchResults = false;
     private string _searchString;
 
     public ICommand ClearSearchCommand { get; }
     public ICommand PerformSearchCommand { get; }
-
-    public Process EditorProcess
-    {
-        get => _editorProcess;
-        set
-        {
-            _editorProcess = value;
-            OnPropertyChanged(nameof(EditorProcess));
-        }
-    }
 
     public ObservableCollection<NoteListItem> NoteList { get; } = new ObservableCollection<NoteListItem>();
 
@@ -148,7 +136,7 @@ public class NoteListViewModel : INotifyPropertyChanged
         }
         else
         {
-            EditorProcess = _editorService.OpenInEditor(SelectedNote.FullPath);
+            _editorService.OpenInEditor(SelectedNote.FullPath);
         }
     }
 

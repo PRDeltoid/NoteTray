@@ -112,10 +112,10 @@ public class WindowsStateSnapshotter
 			
 		return new Rectangle
 		{
-			X = procRecRaw.Left,
+			X = procRecRaw.Left + 8,
 			Y = procRecRaw.Top,
-			Width = procRecRaw.Right - procRecRaw.Left + 1,
-			Height = procRecRaw.Bottom - procRecRaw.Top + 1
+			Width = procRecRaw.Right - procRecRaw.Left - 16,
+			Height = procRecRaw.Bottom - procRecRaw.Top - 8
 		};	
 	}
 }
