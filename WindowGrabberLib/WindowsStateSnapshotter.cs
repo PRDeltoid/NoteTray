@@ -17,10 +17,8 @@ public static class WindowsStateSnapshotter
 	static extern IntPtr GetDesktopWindow();
 	[DllImport("User32.dll")]
 	static extern IntPtr GetWindow(IntPtr hwnd, uint command);
-	
 	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 	static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
 	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 	static extern int GetWindowTextLength(IntPtr hWnd);
 	[DllImport("user32.dll", SetLastError=true)]
@@ -76,11 +74,12 @@ public static class WindowsStateSnapshotter
 	{
 		List<WindowRectangle> procWindows = new List<WindowRectangle>();
 		uint zLevel = 0;
+		// Start from the bottom (the desktop) and work up through the windows by z-level
 		IntPtr window = GetTopWindow(GetDesktopWindow());
 		do
 		{
 			string windowTitle = GetWindowTitle(window);
-			//Not visible, our own window, or not a real window? skip
+			// Skip loop early if the window matches the ignoreWindow param, is not visible or is not a real window
 			if(IsWindowVisible(window) == false || window == ignoreWindow || windowTitle is "" or "Program Manager" or "Microsoft Text Input Application")  continue;
 			
 			procWindows.Add(new WindowRectangle(window, windowTitle, GetWindowRect(window), zLevel));
@@ -95,11 +94,11 @@ public static class WindowsStateSnapshotter
 		return (result & WS_VISIBLE) != 0;
 	}
 
-	private static string GetWindowTitle(IntPtr hWnd)
+	private static string GetWindowTitle(IntPtr window)
 	{
-		int length = GetWindowTextLength(hWnd) + 1;
+		int length = GetWindowTextLength(window) + 1;
 		StringBuilder title = new StringBuilder(length);
-		GetWindowText(hWnd, title, length);
+		GetWindowText(window, title, length);
 		return title.ToString();
 	}
 
