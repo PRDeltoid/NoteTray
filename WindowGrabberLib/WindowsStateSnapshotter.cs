@@ -1,14 +1,12 @@
-﻿using System.Diagnostics;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
-using System.Windows.Interop;
 
 namespace WindowGrabberLib;
 
 public class WindowsStateSnapshotter
 {
+	#region WinAPI Imports
 	[DllImport("user32.dll")]
 	private static extern bool GetWindowRect(IntPtr hWnd, ref RECT rect);
 	[DllImport("user32.dll")]
@@ -74,6 +72,7 @@ public class WindowsStateSnapshotter
 		public readonly int Right;       // x position of lower-right corner
 		public readonly int Bottom;      // y position of lower-right corner
 	}
+	#endregion
 	
 	public static List<WindowRectangle> GetStateSnapshot()
 	{
@@ -86,7 +85,7 @@ public class WindowsStateSnapshotter
 			string windowTitle = GetWindowTitle(window);
 			if(IsWindowVisible(window) == false || windowTitle is "" or "Program Manager" or "Microsoft Text Input Application")  continue;
 			
-			procWindows.Add(new WindowRectangle(window, GetWindowTitle(window), GetWindowRect(window), zLevel));
+			procWindows.Add(new WindowRectangle(window, windowTitle, GetWindowRect(window), zLevel));
 			zLevel++;
 		} while ((window = GetWindow(window, 2 /*GW_HWNDNEXT*/)) != IntPtr.Zero);
 		return procWindows;
@@ -113,8 +112,8 @@ public class WindowsStateSnapshotter
 			
 		return new Rectangle
 		{
-			X = procRecRaw.Left + 8,
-			Y = procRecRaw.Top + 8,
+			X = procRecRaw.Left,
+			Y = procRecRaw.Top,
 			Width = procRecRaw.Right - procRecRaw.Left + 1,
 			Height = procRecRaw.Bottom - procRecRaw.Top + 1
 		};	

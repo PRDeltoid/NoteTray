@@ -16,4 +16,9 @@ public class WindowRectangle
 		Bounds = bounds;
 		ZLevel = zLevel;
 	}
+
+	public bool Contains(Point p)
+	{
+		return Bounds.Contains(p);
+	}
 }
