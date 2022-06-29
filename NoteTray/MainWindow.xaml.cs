@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using NoteTray.Commands;
 using Serilog;
 using WindowGrabberLib;
@@ -15,6 +16,7 @@ namespace NoteTray
     {
         private readonly WindowSnapper _windowSnapper;
         private readonly WindowGrabber _grabber;
+        private readonly WindowInteropHelper _windowHelper;
 
         public ICommand OpenPreferencesCommand { get; }
         
@@ -30,6 +32,10 @@ namespace NoteTray
             // Window Grabber is used to allow the user to select what process they want to snap to
             _grabber = new WindowGrabber();
             InitializeComponent();
+            
+            // Helps get the handle of this window.
+            // The usual method of using Process.GetCurrentProcess() returns a different process than the main window
+            _windowHelper = new WindowInteropHelper(this);
         }
 
         private void Exit_OnClick(object sender, RoutedEventArgs e)
@@ -40,7 +46,8 @@ namespace NoteTray
         private async void Dock_OnClick(object sender, RoutedEventArgs e)
         {
             // Ask the user to select a window and then snap to it
-            _windowSnapper.Attach(await _grabber.GrabWindowAsync());
+            // Pass this window's handle so we can ignore it in the grabber
+            _windowSnapper.Attach(await _grabber.GrabWindowAsync(_windowHelper.Handle));
         }
         
         private void Preferences_OnClick(object sender, RoutedEventArgs e)

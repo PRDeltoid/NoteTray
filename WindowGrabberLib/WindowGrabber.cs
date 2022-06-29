@@ -88,17 +88,20 @@ public class WindowGrabber
 		MouseUnhook();
 	}
 	
-	public async Task<IntPtr> GrabWindowAsync()
+	public async Task<IntPtr> GrabWindowAsync(IntPtr ignoreWindow)
 	{
 		Log.Debug($"GrabWindow running");
-		List<WindowRectangle> state = WindowsStateSnapshotter.GetStateSnapshot();
+		List<WindowRectangle> state = WindowsStateSnapshotter.GetStateSnapshot(ignoreWindow);
 		_timer = new PeriodicTimer(TimeSpan.FromMilliseconds(200));
 
+		// Grab access to a Graphics object which allows us to draw arbitrarily to the screen
 		IntPtr desktop = GetDC(IntPtr.Zero);
 		using Graphics g = Graphics.FromHdc(desktop);
 		
+		// Start listening for mouse click events
 		MouseHook();
-
+		
+		// Every time the timer ticks, we should check if the user is hovering over a window and highlight it if they are
 		while (await _timer.WaitForNextTickAsync())
 		{
 			Point p = GetCursorPosition();
@@ -114,15 +117,22 @@ public class WindowGrabber
 				}
 			}
 		}
+		
+		// When we get here, the user has clicked and our Mouse Hook function has fired
+		// Stop listening for mouse clicks to prevent further firing of the hook func
 		MouseUnhook();
 		
+		// Figure out where the user ended up clicking
 		Point finishPos = GetCursorPosition();
 		Log.Debug($"Window selection stopped. Final position: ({finishPos.X}, {finishPos.Y})");
+		
+		// Dispose of the desktop handle
 		int _ = ReleaseDC(IntPtr.Zero, desktop);
 
 		// Find what window was clicked (if any)
 		foreach (WindowRectangle window in state)
 		{
+			// We found a clicked window. Return the handle.
 			if (window.Contains(finishPos))
 			{
 				Log.Debug($"Clicked window: {window.Title} ({window.Window})");

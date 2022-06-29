@@ -4,13 +4,11 @@ using System.Text;
 
 namespace WindowGrabberLib;
 
-public class WindowsStateSnapshotter
+public static class WindowsStateSnapshotter
 {
 	#region WinAPI Imports
 	[DllImport("user32.dll")]
 	private static extern bool GetWindowRect(IntPtr hWnd, ref RECT rect);
-	[DllImport("user32.dll")]
-	private static extern bool GetClientRect(IntPtr hWnd, ref RECT rect);
 	[DllImport("User32.dll")]
 	static extern int GetWindowLong(IntPtr hwnd, GWL style);
 	[DllImport("User32.dll")]
@@ -74,16 +72,16 @@ public class WindowsStateSnapshotter
 	}
 	#endregion
 	
-	public static List<WindowRectangle> GetStateSnapshot()
+	public static List<WindowRectangle> GetStateSnapshot(IntPtr ignoreWindow)
 	{
 		List<WindowRectangle> procWindows = new List<WindowRectangle>();
 		uint zLevel = 0;
 		IntPtr window = GetTopWindow(GetDesktopWindow());
 		do
 		{
-			//Not visible or a real window? skip
 			string windowTitle = GetWindowTitle(window);
-			if(IsWindowVisible(window) == false || windowTitle is "" or "Program Manager" or "Microsoft Text Input Application")  continue;
+			//Not visible, our own window, or not a real window? skip
+			if(IsWindowVisible(window) == false || window == ignoreWindow || windowTitle is "" or "Program Manager" or "Microsoft Text Input Application")  continue;
 			
 			procWindows.Add(new WindowRectangle(window, windowTitle, GetWindowRect(window), zLevel));
 			zLevel++;
