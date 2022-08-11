@@ -42,7 +42,7 @@ public class SQLiteDatabaseService : IDatabaseService
         }
         catch (Exception e)
         {
-            Log.Error("Exception: {e}", e);
+            Log.Error("CommandString: {c}, Params: {p}, Exception: {e}", commandString, parameters, e);
             return Enumerable.Empty<T>();
         } 
     }
