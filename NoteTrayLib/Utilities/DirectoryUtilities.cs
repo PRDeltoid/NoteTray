@@ -15,17 +15,17 @@ public static class DirectoryUtilities
         }).Select(x => new NoteListItem() {FullPath = x, Name = Path.GetFileName(x), IsDirectory = true});
     }
 
-    public static IEnumerable<NoteListItem> GetChildFiles(string basePath, string filter =  null)
+    public static IEnumerable<NoteListItem> GetChildFiles(string basePath, string filter = null)
     {
         Regex searchPattern;
-        if (filter != null)
+        if (filter is not null)
         {
             searchPattern = new Regex( filter.Replace('*', '\\'), RegexOptions.IgnoreCase); 
         }
         else
         {
             // If no filter is present, just use a wildcard to get all results
-            searchPattern = new Regex("*", RegexOptions.IgnoreCase); 
+            searchPattern = new Regex(".*", RegexOptions.IgnoreCase);
         }
         
         return Directory.EnumerateFiles(basePath).Where(file =>

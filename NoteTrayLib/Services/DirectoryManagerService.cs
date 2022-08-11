@@ -29,7 +29,7 @@ public class DirectoryManagerService
 
         _directory = userPreferences.BasePath;
 
-        _fileFilter = _userPrefs.NoteFileFilter ?? "*";
+        _fileFilter = _userPrefs.NoteFileFilter;
         _userPrefs.PropertyChanged += OnFileFilterChanged;
 
         _rootPath = _directory;
@@ -37,7 +37,7 @@ public class DirectoryManagerService
 
     private void OnFileFilterChanged(object sender, PropertyChangedEventArgs e)
     {
-        _fileFilter = _userPrefs.NoteFileFilter ?? "*"; 
+        _fileFilter = _userPrefs.NoteFileFilter; 
     }
 
     public void SetCurrentDirectory(string path)

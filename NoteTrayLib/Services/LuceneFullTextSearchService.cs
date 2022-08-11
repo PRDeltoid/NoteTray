@@ -131,7 +131,7 @@ public class LuceneFullTextSearchService : IFullTextSearchService
     private void IndexDirectory(string directoryPath, bool recursive)
     {
         string filter = _userPrefs.NoteFileFilter;
-        foreach (NoteListItem file in DirectoryUtilities.GetChildFiles(directoryPath, filter ?? "*"))
+        foreach (NoteListItem file in DirectoryUtilities.GetChildFiles(directoryPath, filter))
         {
             IndexFile(file.FullPath);
         }
