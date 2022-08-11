@@ -32,6 +32,7 @@ public class FileChangeWatcher
 
     private void CreateWatchers(string basePath, bool includeSubdirectories, string filters = "")
     {
+        if (string.IsNullOrEmpty(filters)) return;
         foreach (string filter in filters.Split("|"))
         {
             CreateWatcher(basePath, includeSubdirectories, filter);
