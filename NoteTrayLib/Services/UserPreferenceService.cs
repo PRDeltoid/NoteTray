@@ -36,7 +36,7 @@ public class UserPreferenceService : INotifyPropertyChanged
 	public bool? FirstRunFlag
 	{
 		get => TryGetStructOrNull<bool>(FIRST_RUN_FLAG);
-		set => Set(FIRST_RUN_FLAG, value);
+		set => Set(FIRST_RUN_FLAG, value.ToString());
 	}
 
 	private void Set(string prefName, object val)
